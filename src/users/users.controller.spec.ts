@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
-import { PrismaService } from 'src/prisma.service';
+import { PrismaService } from 'src/database/prisma.service';
 
 describe('UsersController', () => {
   let controller: UsersController;
