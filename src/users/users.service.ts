@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/database/prisma.service';
 import { HashingService } from 'src/common/hashing.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
@@ -28,22 +29,27 @@ export class UsersService {
   }
 
   async validateUser(email: string, password: string) {
-    const user = await this.prisma.user.findUnique({ where: { email } });
+    const user = await this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        name: true,
+        username: true,
+        email: true,
+        password: true,
+      },
+    });
 
-    if (!user) {
+    if (
+      !user &&
+      (await this.hashingService.comparePasswords(password, user.password))
+    ) {
       return null;
     }
 
-    const isPasswordValid = await this.hashingService.comparePasswords(
-      password,
-      user.password,
-    );
+    const { password: _password, ...payload } = user;
 
-    if (!isPasswordValid) {
-      return null;
-    }
-
-    return user;
+    return payload;
   }
 
   findAll() {
@@ -62,6 +68,22 @@ export class UsersService {
         createAt: true,
         updateAt: true,
       },
+    });
+  }
+
+  findOneByEmail(
+    email: string,
+    fields: Prisma.userSelect = {
+      id: true,
+      name: true,
+      username: true,
+      createAt: true,
+      updateAt: true,
+    },
+  ) {
+    return this.prisma.user.findFirst({
+      where: { email: email },
+      select: fields,
     });
   }
 
