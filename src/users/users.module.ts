@@ -3,10 +3,17 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { PrismaService } from 'src/database/prisma.service';
 import { HashingService } from 'src/common/hashing.service';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService, PrismaService, HashingService],
+  providers: [
+    UsersService,
+    PrismaService,
+    HashingService,
+    { provide: APP_GUARD, useClass: JwtAuthGuard },
+  ],
   exports: [UsersService],
 })
 export class UsersModule {}
