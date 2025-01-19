@@ -12,7 +12,14 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { password } = createUserDto;
+    const { password, email } = createUserDto;
+
+    // Verify duplicated user
+    const userExists = await this.prisma.user.findUnique({ where: { email } });
+
+    if (userExists)
+      throw new HttpException('User already exists', HttpStatus.CONFLICT);
+
     const hashedPassword = await this.hashingService.hashPassword(password);
 
     return this.prisma.user.create({
