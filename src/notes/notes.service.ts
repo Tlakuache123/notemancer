@@ -34,8 +34,10 @@ export class NotesService {
     return this.prisma.note.findMany({ where: { authorId: idAuthor } });
   }
 
-  findOne(id: number) {
-    return this.prisma.note.findUnique({ where: { id: id } });
+  async findOne(id: number) {
+    const note = await this.prisma.note.findUnique({ where: { id: id } });
+    if (!note) throw new HttpException('Note not found', HttpStatus.NOT_FOUND);
+    return note;
   }
 
   async update(id: number, idAuthor: number, updateNoteDto: UpdateNoteDto) {

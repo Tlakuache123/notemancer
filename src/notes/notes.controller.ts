@@ -19,12 +19,12 @@ export class NotesController {
 
   @Post()
   create(@Body() createNoteDto: CreateNoteDto, @GetUser() user: UserFromJwt) {
-    return this.notesService.create(createNoteDto, user.sid);
+    return this.notesService.create(createNoteDto, user.id);
   }
 
   @Get()
   findAll(@GetUser() user: UserFromJwt) {
-    return this.notesService.findAll(user.sid);
+    return this.notesService.findAll(user.id);
   }
 
   @Get(':id')
@@ -38,7 +38,7 @@ export class NotesController {
     @Body() updateNoteDto: UpdateNoteDto,
     @GetUser() user: UserFromJwt,
   ) {
-    return this.notesService.update(+id, user.sid, updateNoteDto);
+    return this.notesService.update(+id, user.id, updateNoteDto);
   }
 
   @Delete(':id')
