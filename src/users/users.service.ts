@@ -73,7 +73,7 @@ export class UsersService {
 
   findOneByEmail(
     email: string,
-    fields: Prisma.userSelect = {
+    fields: Prisma.UserSelect = {
       id: true,
       name: true,
       username: true,
