@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { NotesModule } from './notes/notes.module';
+import { InitModule } from './init/init.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { NotesModule } from './notes/notes.module';
       isGlobal: true,
     }),
     NotesModule,
+    InitModule,
   ],
   controllers: [AppController],
   providers: [AppService],
