@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from 'src/database/prisma.service';
@@ -7,6 +7,8 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UsersService {
+  private logger = new Logger(UsersService.name);
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly hashingService: HashingService,
@@ -41,7 +43,7 @@ export class UsersService {
     });
 
     if (
-      !user &&
+      !user ||
       (await this.hashingService.comparePasswords(password, user.password))
     ) {
       return null;
