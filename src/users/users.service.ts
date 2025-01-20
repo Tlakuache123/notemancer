@@ -42,9 +42,11 @@ export class UsersService {
       },
     });
 
+    this.logger.debug(user);
+
     if (
       !user ||
-      (await this.hashingService.comparePasswords(password, user.password))
+      !(await this.hashingService.comparePasswords(password, user.password))
     ) {
       return null;
     }
