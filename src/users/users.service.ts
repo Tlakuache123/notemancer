@@ -42,8 +42,6 @@ export class UsersService {
       },
     });
 
-    this.logger.debug(user);
-
     if (
       !user ||
       !(await this.hashingService.comparePasswords(password, user.password))

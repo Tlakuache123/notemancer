@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { PrismaService } from 'src/database/prisma.service';
+import { UploadFileDto } from './dto/upload-file.dto';
 
 @Injectable()
 export class NotesService {
@@ -27,6 +28,30 @@ export class NotesService {
 
     return this.prisma.note.create({
       data: { ...createNoteDto, author: { connect: { id: idAuthor } } },
+    });
+  }
+
+  async createByFile(
+    uploadFileDto: UploadFileDto,
+    file: Express.Multer.File,
+    idAuthor: number,
+  ) {
+    const { title } = uploadFileDto;
+
+    if (await this.verifyExistance(title, idAuthor))
+      throw new HttpException(
+        'Note with the same title already exists',
+        HttpStatus.CONFLICT,
+      );
+
+    const content: string = file.buffer.toString();
+
+    return this.prisma.note.create({
+      data: {
+        title: title,
+        content: content,
+        author: { connect: { id: idAuthor } },
+      },
     });
   }
 
