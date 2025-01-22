@@ -1,24 +1,25 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Patch,
-  Param,
+  Controller,
   Delete,
-  UseInterceptors,
-  UploadedFile,
-  ParseFilePipe,
-  MaxFileSizeValidator,
   FileTypeValidator,
+  Get,
+  MaxFileSizeValidator,
+  Param,
+  ParseFilePipe,
+  ParseIntPipe,
+  Patch,
+  Post,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { NotesService } from './notes.service';
-import { CreateNoteDto } from './dto/create-note.dto';
-import { UpdateNoteDto } from './dto/update-note.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { GetUser } from 'src/decorators/get-user.decorator';
 import { UserFromJwt } from 'src/types/user-jwt.interface';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateNoteDto } from './dto/create-note.dto';
+import { UpdateNoteDto } from './dto/update-note.dto';
 import { UploadFileDto } from './dto/upload-file.dto';
+import { NotesService } from './notes.service';
 
 @Controller('notes')
 export class NotesController {
@@ -35,8 +36,8 @@ export class NotesController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.notesService.findOne(+id);
+  findOne(@Param('id') id: string, @GetUser() user: UserFromJwt) {
+    return this.notesService.findOne(+id, user.id);
   }
 
   @Patch(':id')
@@ -69,5 +70,13 @@ export class NotesController {
     @GetUser() user: UserFromJwt,
   ) {
     return this.notesService.createByFile(uploadFileDto, file, user.id);
+  }
+
+  @Get('html/:id')
+  findOneToHTML(
+    @Param('id', ParseIntPipe) id: number,
+    @GetUser() user: UserFromJwt,
+  ) {
+    return this.notesService.exportToHTML(id, user.id);
   }
 }

@@ -3,6 +3,7 @@ import { CreateNoteDto } from './dto/create-note.dto';
 import { UpdateNoteDto } from './dto/update-note.dto';
 import { PrismaService } from 'src/database/prisma.service';
 import { UploadFileDto } from './dto/upload-file.dto';
+import { marked } from 'marked';
 
 @Injectable()
 export class NotesService {
@@ -59,8 +60,10 @@ export class NotesService {
     return this.prisma.note.findMany({ where: { authorId: idAuthor } });
   }
 
-  async findOne(id: number) {
-    const note = await this.prisma.note.findUnique({ where: { id: id } });
+  async findOne(id: number, idAuthor: number) {
+    const note = await this.prisma.note.findUnique({
+      where: { id: id, authorId: idAuthor },
+    });
     if (!note) throw new HttpException('Note not found', HttpStatus.NOT_FOUND);
     return note;
   }
@@ -79,5 +82,10 @@ export class NotesService {
 
   remove(id: number) {
     return this.prisma.note.delete({ where: { id: id } });
+  }
+
+  async exportToHTML(id: number, idAuthor: number) {
+    const note = await this.findOne(id, idAuthor);
+    return marked.parse(note.content);
   }
 }
